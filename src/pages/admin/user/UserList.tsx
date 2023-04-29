@@ -7,10 +7,8 @@ const UserList = () => {
   const navigate = useNavigate();
   const selectUserList = async () => {
     await axios.post("/v1/admin/user/selectUserList", {}).then((res) => {
-      console.log(res.data.data);
-      setUserList(res.data.data.content);
+      setUserList(res.data.data.userList.content);
     });
-    console.log(userList);
   };
   useEffect(() => {
     selectUserList();
