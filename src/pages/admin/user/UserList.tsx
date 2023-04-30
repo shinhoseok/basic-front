@@ -1,17 +1,26 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import UserVO from "../../../vo/UserVO";
+import ResponsePageableVO from "../../../vo/ResponseVO";
 
 const UserList = () => {
-  const [userList, setUserList] = useState<any[]>([]);
+  const [rslt, setRslt] = useState<ResponsePageableVO<UserVO>>();
+  let rsltMap: ResponsePageableVO<UserVO> | null = null;
+  let start = 0;
   const navigate = useNavigate();
-  const selectUserList = async () => {
+  const selectUserList = async (pageNum: number) => {
     await axios.post("/v1/admin/user/selectUserList", {}).then((res) => {
-      setUserList(res.data.data.userList.content);
+      // setRslt(res.data.data.userList);
+      rsltMap = res.data.data.userList;
+      if (rsltMap) {
+        start = Math.floor(rsltMap.number / 10) * 10 + 1;
+      }
     });
   };
   useEffect(() => {
-    selectUserList();
+    console.log(111);
+    selectUserList(1);
   }, []);
   const insertUser = (e: any) => {
     navigate("/admin/user/insertUser");
@@ -86,8 +95,8 @@ const UserList = () => {
             </tr>
           </thead>
           <tbody>
-            {userList.length ? (
-              userList.map((user, idx) => (
+            {rslt?.content.length ? (
+              rslt.content.map((user, idx) => (
                 <tr key={idx} className="row">
                   <td>{idx + 1}</td>
                   <td>{user.userId}</td>
@@ -116,8 +125,19 @@ const UserList = () => {
 
       <div className="paging_place">
         <div className="paging_wrap">
-          <a href="#" title="맨 앞으로" className="pprev"></a>
-          <a href="#" title="이전" className="prev"></a>
+          <a
+            style={{ display: rslt?.first ? "none" : "block" }}
+            href="javascript:void(0)"
+            title="맨 앞으로"
+            className="pprev"
+            onClick={() => selectUserList(1)}
+          ></a>
+          <a
+            style={{ display: rslt?.first ? "none" : "block" }}
+            href="javascript:void(0)"
+            title="이전"
+            className="prev"
+          ></a>
           <span>
             <a href="#" className="active">
               1
