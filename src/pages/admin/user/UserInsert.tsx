@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import TypeChecker from "../../../contents/js/validation";
 import UserVO from "../../../vo/UserVO";
 import ErrorVO from "../../../vo/ErrorVO";
+import KakaoJusoPopupDom from "../../common/KakaoJusoPopupDom";
+import KakaoJusoPopupPostCode from "../../common/KakaoJusoPopupPostCode";
 
 const UserInsert = () => {
   const intialValues = {
@@ -17,6 +19,16 @@ const UserInsert = () => {
   const [formErrors, setFormErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const formRef = useRef<null[] | HTMLDivElement[]>([]);
+  // 팝업창 상태 관리
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  // 팝업창 열기
+  const openPostCode = () => {
+    setIsPopupOpen(true);
+  };
+  // 팝업창 닫기
+  const closePostCode = () => {
+    setIsPopupOpen(false);
+  };
   const navigate = useNavigate();
   const submitForm = async () => {
     await axios
@@ -181,6 +193,40 @@ const UserInsert = () => {
                   </div>
                 </td>
               </tr>
+              <tr>
+                <th>기본주소</th>
+                <td>
+                  <div className="commonSearch_wrap">
+                    <label className="blind">d</label>
+                    <input
+                      id="addrBasic"
+                      name="addrBasic"
+                      disabled={true}
+                      style={{ width: "240px" }}
+                      type="text"
+                    />
+                    <button
+                      type="button"
+                      className="grayBtn M"
+                      onClick={openPostCode}
+                    >
+                      주소찾기
+                    </button>
+                  </div>
+                </td>
+                <th>상세주소</th>
+                <td>
+                  <div className="commonSearch_wrap">
+                    <label className="blind">d</label>
+                    <input
+                      id="addrDetail"
+                      name="addrDetail"
+                      style={{ width: "320px" }}
+                      type="text"
+                    />
+                  </div>
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -195,6 +241,15 @@ const UserInsert = () => {
               취소
             </button>
           </a>
+        </div>
+      </div>
+      <div>
+        <div id="popupDom">
+          {isPopupOpen && (
+            <KakaoJusoPopupDom>
+              <KakaoJusoPopupPostCode onClose={closePostCode} />
+            </KakaoJusoPopupDom>
+          )}
         </div>
       </div>
     </form>
