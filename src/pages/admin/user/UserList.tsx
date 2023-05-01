@@ -2,24 +2,24 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import UserVO from "../../../vo/UserVO";
-import ResponsePageableVO from "../../../vo/ResponseVO";
+import Paging from "../../common/Paging";
+import PageableVO from "../../../vo/PageableVO";
 
 const UserList = () => {
-  const [rslt, setRslt] = useState<ResponsePageableVO<UserVO>>();
-  let rsltMap: ResponsePageableVO<UserVO> | null = null;
-  let start = 0;
+  const [rsltMap, setRsltMap] = useState<PageableVO<UserVO>>();
+  const [searchCondition, setSearchCondition] = useState<string>("");
+  const [searchKeyword, setSearchKeyword] = useState<string>("");
   const navigate = useNavigate();
   const selectUserList = async (pageNum: number) => {
-    await axios.post("/v1/admin/user/selectUserList", {}).then((res) => {
-      // setRslt(res.data.data.userList);
-      rsltMap = res.data.data.userList;
-      if (rsltMap) {
-        start = Math.floor(rsltMap.number / 10) * 10 + 1;
-      }
+    let param = {
+      page: pageNum,
+    };
+    await axios.post("/v1/admin/user/selectUserList", param).then((res) => {
+      const userList = res.data.data.userList;
+      setRsltMap(userList);
     });
   };
   useEffect(() => {
-    console.log(111);
     selectUserList(1);
   }, []);
   const insertUser = (e: any) => {
@@ -38,16 +38,18 @@ const UserList = () => {
         &nbsp;〉&nbsp;사용자관리&nbsp;〉&nbsp;사용자관리
       </p>
       <div className="selectBox">
-        <select name="select" className="w13p">
-          <option>2014</option>
+        <select
+          name="select"
+          className="w13p"
+          value={searchCondition}
+          onChange={(e) => setSearchCondition(e.target.value)}
+        >
+          <option value="userNm">성명</option>
+          <option value="emailAddr">이메일</option>
         </select>
         <input className="searchName" name="" type="text" />
         <button type="button" className="grayBtn ico">
           <img src={require("@contents/images/ico_search.png")} /> 검색
-        </button>
-        <button type="button" className="grayBtn02 ico">
-          {" "}
-          초기화
         </button>
       </div>
 
@@ -65,13 +67,15 @@ const UserList = () => {
             <tr>
               <th className="noBg">번호</th>
               <th>
-                아이디
-                <span className="arrow_ascending">
-                  <a href="#"></a>
-                </span>
-                <span className="arrow_descending">
-                  <a href="#"></a>
-                </span>
+                <div>
+                  아이디
+                  <span className="arrow_ascending">
+                    <a href="#"></a>
+                  </span>
+                  <span className="arrow_descending">
+                    <a href="#"></a>
+                  </span>
+                </div>
               </th>
               <th>
                 성명
@@ -95,8 +99,8 @@ const UserList = () => {
             </tr>
           </thead>
           <tbody>
-            {rslt?.content.length ? (
-              rslt.content.map((user, idx) => (
+            {rsltMap?.content.length ? (
+              rsltMap?.content.map((user, idx) => (
                 <tr key={idx} className="row">
                   <td>{idx + 1}</td>
                   <td>{user.userId}</td>
@@ -122,40 +126,7 @@ const UserList = () => {
           </a>
         </div>
       </div>
-
-      <div className="paging_place">
-        <div className="paging_wrap">
-          <a
-            style={{ display: rslt?.first ? "none" : "block" }}
-            href="javascript:void(0)"
-            title="맨 앞으로"
-            className="pprev"
-            onClick={() => selectUserList(1)}
-          ></a>
-          <a
-            style={{ display: rslt?.first ? "none" : "block" }}
-            href="javascript:void(0)"
-            title="이전"
-            className="prev"
-          ></a>
-          <span>
-            <a href="#" className="active">
-              1
-            </a>
-            <a href="#">2</a>
-            <a href="#">3</a>
-            <a href="#">4</a>
-            <a href="#">5</a>
-            <a href="#">6</a>
-            <a href="#">7</a>
-            <a href="#">8</a>
-            <a href="#">9</a>
-            <a href="#">10</a>
-          </span>
-          <a href="#" title="다음" className="next"></a>
-          <a href="#" title="맨 뒤로" className="nnext"></a>
-        </div>
-      </div>
+      <Paging selectList={selectUserList} rsltMap={rsltMap} />
     </div>
   );
 };

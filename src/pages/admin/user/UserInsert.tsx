@@ -2,6 +2,8 @@ import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import TypeChecker from "../../../contents/js/validation";
+import UserVO from "../../../vo/UserVO";
+import ErrorVO from "../../../vo/ErrorVO";
 
 const UserInsert = () => {
   const intialValues = {
@@ -10,8 +12,8 @@ const UserInsert = () => {
     userNm: "",
     pno: "",
     mblPno: "",
-  };
-  const [formValues, setFormValues] = useState(intialValues);
+  } as UserVO;
+  const [formValues, setFormValues] = useState<UserVO>(intialValues);
   const [formErrors, setFormErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const formRef = useRef<null[] | HTMLDivElement[]>([]);
@@ -34,8 +36,8 @@ const UserInsert = () => {
     setFormErrors(validate(formValues));
     setIsSubmitting(true);
   };
-  const validate = (values: any) => {
-    let errors: any = {};
+  const validate = (values: UserVO) => {
+    let errors = {} as ErrorVO;
     if (!values.emailAddr) {
       errors.msg = "이메일을 입력하세요";
       alert(errors.msg);

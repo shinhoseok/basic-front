@@ -3,15 +3,7 @@ interface CommDefaultVO {
   regId: string;
   modDt: string;
   modId: string;
-  //paging
-  last: boolean;
-  totalPages: number;
-  totalElements: number;
-  first: boolean;
-  numberOfElements: number;
-  number: number;
-  size: number;
-  empty: boolean;
+  page: number;
 }
 
 export default CommDefaultVO;
