@@ -1,24 +1,28 @@
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import TypeChecker from "../../../contents/js/validation";
+import TypeChecker from "../../../contents/js/TypeChecker";
 import UserVO from "../../../vo/UserVO";
 import ErrorVO from "../../../vo/ErrorVO";
 import KakaoJusoPopupDom from "../../common/KakaoJusoPopupDom";
 import KakaoJusoPopupPostCode from "../../common/KakaoJusoPopupPostCode";
+import $ from "jquery";
 
 const UserInsert = () => {
   const intialValues = {
     emailAddr: "",
     userPw: "",
     userNm: "",
-    pno: "",
+    addr: "",
+    addrDetail: "",
     mblPno: "",
   } as UserVO;
   const [formValues, setFormValues] = useState<UserVO>(intialValues);
   const [formErrors, setFormErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const formRef = useRef<null[] | HTMLDivElement[]>([]);
+  const jusoModal = useRef<HTMLDivElement>(null);
+
   // 팝업창 상태 관리
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   // 팝업창 열기
@@ -29,6 +33,15 @@ const UserInsert = () => {
   const closePostCode = () => {
     setIsPopupOpen(false);
   };
+  const handleCloseModal = (e: any) => {
+    if (
+      isPopupOpen &&
+      (!jusoModal.current || !jusoModal.current.contains(e.target))
+    ) {
+      setIsPopupOpen(false);
+    }
+  };
+
   const navigate = useNavigate();
   const submitForm = async () => {
     await axios
@@ -68,6 +81,12 @@ const UserInsert = () => {
       formRef.current[1]?.focus();
       return errors;
     }
+    if (!values.userPw) {
+      errors.msg = "비밀번호를 입력하세요";
+      alert(errors.msg);
+      formRef.current[1]?.focus();
+      return errors;
+    }
     return errors;
   };
   useEffect(() => {
@@ -75,6 +94,14 @@ const UserInsert = () => {
       submitForm();
     }
   }, [formErrors]); //submit을 눌러 formErrors가 변할때만 실행
+
+  useEffect(() => {
+    //팝업 외 다른 영역 클릭하면 팝업 종료
+    window.addEventListener("click", handleCloseModal);
+    return () => {
+      window.removeEventListener("click", handleCloseModal);
+    };
+  }, []);
 
   return (
     <form onSubmit={handleSubmit}>
@@ -180,11 +207,11 @@ const UserInsert = () => {
                       d
                     </label>
                     <input
-                      name="pno"
+                      name="mblPno"
                       style={{ width: "320px" }}
                       type="text"
                       placeholder="000-0000-0000"
-                      value={formValues.pno}
+                      value={formValues.mblPno}
                       onChange={handleChange}
                       ref={(element) => {
                         formRef.current[3] = element;
@@ -199,9 +226,10 @@ const UserInsert = () => {
                   <div className="commonSearch_wrap">
                     <label className="blind">d</label>
                     <input
-                      id="addrBasic"
-                      name="addrBasic"
+                      id="addr"
+                      name="addr"
                       disabled={true}
+                      onChange={handleChange}
                       style={{ width: "240px" }}
                       type="text"
                     />
@@ -221,6 +249,7 @@ const UserInsert = () => {
                     <input
                       id="addrDetail"
                       name="addrDetail"
+                      onChange={handleChange}
                       style={{ width: "320px" }}
                       type="text"
                     />
@@ -247,7 +276,7 @@ const UserInsert = () => {
         <div id="popupDom">
           {isPopupOpen && (
             <KakaoJusoPopupDom>
-              <KakaoJusoPopupPostCode onClose={closePostCode} />
+              <KakaoJusoPopupPostCode onClose={closePostCode} ref={jusoModal} />
             </KakaoJusoPopupDom>
           )}
         </div>

@@ -4,9 +4,10 @@ interface UserVO extends CommDefaultVO {
   userId: string;
   userPw: string;
   userNm: string;
-  pno: string;
-  emailAddr: string;
   mblPno: string;
+  emailAddr: string;
+  addr: string;
+  addrDetail: string;
 }
 
 export default UserVO;

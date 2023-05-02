@@ -20,7 +20,7 @@ const KakaoJusoPopupPostCode = (props) => {
     // console.log(data);
     // console.log(fullAddress);
     // console.log(data.zonecode);
-    document.getElementById("addrBasic").value = fullAddress;
+    document.getElementById("addr").value = fullAddress;
     props.onClose();
   };
 
@@ -36,7 +36,7 @@ const KakaoJusoPopupPostCode = (props) => {
 
   return (
     <div>
-      <button
+      {/* <button
         type="button"
         onClick={() => {
           props.onClose();
@@ -44,7 +44,7 @@ const KakaoJusoPopupPostCode = (props) => {
         className="grayBtn L"
       >
         닫기
-      </button>
+      </button> */}
       <DaumPostcode style={postCodeStyle} onComplete={handlePostCode} />
     </div>
   );
