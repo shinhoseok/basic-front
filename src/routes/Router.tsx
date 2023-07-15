@@ -1,10 +1,11 @@
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "../pages/Login";
 import UserList from "../pages/admin/user/UserList";
 import Top from "../pages/common/Top";
 import Footer from "../pages/common/Footer";
 import LeftMenu from "../pages/common/LeftMenu";
 import UserInsert from "../pages/admin/user/UserInsert";
+import UserDetail from "../pages/admin/user/UserDetail";
 
 const privatePathList = [
   {
@@ -26,6 +27,11 @@ const privatePathList = [
     id: 4,
     path: "/admin/user/insertUser",
     component: UserInsert,
+  },
+  {
+    id: 5,
+    path: "/admin/user/selectUserDetail",
+    component: UserDetail,
   },
 ];
 

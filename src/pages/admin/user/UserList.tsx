@@ -13,6 +13,8 @@ const UserList = () => {
   const selectUserList = async (pageNum: number) => {
     let param = {
       page: pageNum,
+      searchKeyword: searchKeyword,
+      searchCondition: searchCondition,
     };
     await axios.post("/v1/admin/user/selectUserList", param).then((res) => {
       const userList = res.data.data.userList;
@@ -99,13 +101,18 @@ const UserList = () => {
             </tr>
           </thead>
           <tbody>
-            {rsltMap?.content.length ? (
+            {rsltMap?.content && rsltMap?.content.length > 0 ? (
               rsltMap?.content.map((user, idx) => (
                 <tr key={idx} className="row">
                   <td>{idx + 1}</td>
                   <td>{user.userId}</td>
                   <td>
-                    <a href="#">{user.userNm}</a>
+                    <Link
+                      to={"/admin/user/selectUserDetail"}
+                      state={{ userId: user.userId }}
+                    >
+                      {user.userNm}
+                    </Link>
                   </td>
                   <td>{user.emailAddr}</td>
                   <td>{user.regDt.substring(0, 10)}</td>

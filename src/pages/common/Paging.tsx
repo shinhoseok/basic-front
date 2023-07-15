@@ -35,7 +35,6 @@ const Paging = <T extends CommDefaultVO>({
             display: rsltMap?.first ? "none" : "block",
             cursor: "pointer",
           }}
-          href="javascript:void(0)"
           title="맨 앞으로"
           className="pprev"
           onClick={() => selectList(1)}
@@ -45,7 +44,6 @@ const Paging = <T extends CommDefaultVO>({
             display: startNum == 1 ? "none" : "block",
             cursor: "pointer",
           }}
-          href="javascript:void(0)"
           onClick={() => {
             if (rsltMap?.first) {
               return;
@@ -79,7 +77,6 @@ const Paging = <T extends CommDefaultVO>({
             display: startNum == 1 ? "none" : "block",
             cursor: "pointer",
           }}
-          href="javascript:void(0)"
           title="다음"
           className="next"
           onClick={() => {
@@ -97,7 +94,6 @@ const Paging = <T extends CommDefaultVO>({
             display: rsltMap ? (rsltMap?.last ? "none" : "block") : "block",
             cursor: "pointer",
           }}
-          href="javascript:void(0)"
           title="맨 뒤로"
           className="nnext"
           onClick={() => {

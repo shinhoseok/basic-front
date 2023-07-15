@@ -6,7 +6,6 @@ import UserVO from "../../../vo/UserVO";
 import ErrorVO from "../../../vo/ErrorVO";
 import KakaoJusoPopupDom from "../../common/KakaoJusoPopupDom";
 import KakaoJusoPopupPostCode from "../../common/KakaoJusoPopupPostCode";
-import $ from "jquery";
 
 const UserInsert = () => {
   const intialValues = {
