@@ -28,6 +28,9 @@ const UserList = () => {
     navigate("/admin/user/insertUser");
     e.preventDefault();
   };
+  const selectUserDetail = (userId: string) => {
+    navigate(`/admin/user/selectUserDetail/${userId}`);
+  };
   return (
     <div className="contents">
       <p className="contentTitle">사용자 관리</p>
@@ -103,17 +106,15 @@ const UserList = () => {
           <tbody>
             {rsltMap?.content && rsltMap?.content.length > 0 ? (
               rsltMap?.content.map((user, idx) => (
-                <tr key={idx} className="row">
+                <tr
+                  key={idx}
+                  className="row"
+                  style={{ cursor: "pointer" }}
+                  onClick={() => selectUserDetail(user.userId)}
+                >
                   <td>{idx + 1}</td>
                   <td>{user.userId}</td>
-                  <td>
-                    <Link
-                      to={"/admin/user/selectUserDetail"}
-                      state={{ userId: user.userId }}
-                    >
-                      {user.userNm}
-                    </Link>
-                  </td>
+                  <td>{user.userNm}</td>
                   <td>{user.emailAddr}</td>
                   <td>{user.regDt.substring(0, 10)}</td>
                 </tr>

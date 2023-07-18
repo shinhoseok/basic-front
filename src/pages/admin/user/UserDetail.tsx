@@ -1,16 +1,18 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import UserVO from "../../../vo/UserVO";
 
 const UserDetail = () => {
   const location = useLocation();
-  const userId = location.state.userId;
+  // const userId = location.state.userId;
+  const params = useParams();
+  console.log(params);
   const [userVO, setUserVO] = useState<UserVO>();
   const navigate = useNavigate();
   const selectUserDetail = async () => {
     let param = {
-      userId: userId,
+      userId: params.userId,
     };
     await axios.post("/v1/admin/user/selectUserDetail", param).then((res) => {
       const userVO = res.data.data;
@@ -21,7 +23,7 @@ const UserDetail = () => {
     selectUserDetail();
   }, []);
   const selectUserList = (e: any) => {
-    navigate("/admin/user/insertUser");
+    navigate("/admin/user/selectUserList");
     e.preventDefault();
   };
   return (

@@ -4,8 +4,11 @@ import { useNavigate } from "react-router-dom";
 import TypeChecker from "../../../contents/js/TypeChecker";
 import UserVO from "../../../vo/UserVO";
 import ErrorVO from "../../../vo/ErrorVO";
-import KakaoJusoPopupDom from "../../common/KakaoJusoPopupDom";
-import KakaoJusoPopupPostCode from "../../common/KakaoJusoPopupPostCode";
+import KakaoJusoPopupDom from "../../common/PopupDom";
+import Post from "../../common/PopupDom";
+import PopupDom from "../../common/PopupDom";
+import PopupPostCode from "../../common/PopupPostCode";
+// import KakaoJusoPopupPostCode from "../../common/KakaoJusoPopupPostCode";
 
 const UserInsert = () => {
   const intialValues = {
@@ -20,26 +23,6 @@ const UserInsert = () => {
   const [formErrors, setFormErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const formRef = useRef<null[] | HTMLDivElement[]>([]);
-  const jusoModal = useRef<HTMLDivElement>(null);
-
-  // 팝업창 상태 관리
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-  // 팝업창 열기
-  const openPostCode = () => {
-    setIsPopupOpen(true);
-  };
-  // 팝업창 닫기
-  const closePostCode = () => {
-    setIsPopupOpen(false);
-  };
-  const handleCloseModal = (e: any) => {
-    if (
-      isPopupOpen &&
-      (!jusoModal.current || !jusoModal.current.contains(e.target))
-    ) {
-      setIsPopupOpen(false);
-    }
-  };
 
   const navigate = useNavigate();
   const submitForm = async () => {
@@ -94,13 +77,18 @@ const UserInsert = () => {
     }
   }, [formErrors]); //submit을 눌러 formErrors가 변할때만 실행
 
-  useEffect(() => {
-    //팝업 외 다른 영역 클릭하면 팝업 종료
-    window.addEventListener("click", handleCloseModal);
-    return () => {
-      window.removeEventListener("click", handleCloseModal);
-    };
-  }, []);
+  // 팝업창 상태 관리
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+
+  // 팝업창 열기
+  const openPostCode = () => {
+    setIsPopupOpen(true);
+  };
+
+  // 팝업창 닫기
+  const closePostCode = () => {
+    setIsPopupOpen(false);
+  };
 
   return (
     <form onSubmit={handleSubmit}>
@@ -239,6 +227,13 @@ const UserInsert = () => {
                     >
                       주소찾기
                     </button>
+                    <div id="popupDom">
+                      {isPopupOpen && (
+                        <PopupDom>
+                          <PopupPostCode onClose={closePostCode} />
+                        </PopupDom>
+                      )}
+                    </div>
                   </div>
                 </td>
                 <th>상세주소</th>
@@ -269,15 +264,6 @@ const UserInsert = () => {
               취소
             </button>
           </a>
-        </div>
-      </div>
-      <div>
-        <div id="popupDom">
-          {isPopupOpen && (
-            <KakaoJusoPopupDom>
-              <KakaoJusoPopupPostCode onClose={closePostCode} ref={jusoModal} />
-            </KakaoJusoPopupDom>
-          )}
         </div>
       </div>
     </form>

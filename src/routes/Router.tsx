@@ -15,8 +15,8 @@ const privatePathList = [
   },
   {
     id: 2,
-    path: "/users/:id",
-    component: UserList,
+    path: "/admin/user/selectUserDetail/:userId",
+    component: UserDetail,
   },
   {
     id: 3,
@@ -27,11 +27,6 @@ const privatePathList = [
     id: 4,
     path: "/admin/user/insertUser",
     component: UserInsert,
-  },
-  {
-    id: 5,
-    path: "/admin/user/selectUserDetail",
-    component: UserDetail,
   },
 ];
 
@@ -45,6 +40,10 @@ const Router = () => {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/" element={<Login />} />
+            <Route
+              path="/admin/user/selectUserDetail"
+              element={<UserDetail />}
+            />
             {privatePathList.map((route) => (
               <Route
                 key={route.id}
