@@ -6,25 +6,27 @@ import PageableVO from "../../vo/PageableVO";
 
 interface PageProps<T> {
   selectList: (pageNum: number) => Promise<void>;
-  rsltMap?: PageableVO<T>;
+  resultVO?: PageableVO<T>;
 }
 const Paging = <T extends CommDefaultVO>({
   selectList,
-  rsltMap,
+  resultVO,
 }: PageProps<T>) => {
   const [startNum, setStartNum] = useState<number>(0);
   const [lastNum, setLastNum] = useState<number>(0);
   useEffect(() => {
-    if (rsltMap) {
-      const start = Math.floor(rsltMap.number / 10) * 10 + 1;
+    console.log("paging!!!");
+    console.log(resultVO);
+    if (resultVO) {
+      const start = Math.floor(resultVO.number / 10) * 10 + 1;
       const last =
-        start + 9 < rsltMap.totalPages ? start + 9 : rsltMap.totalPages;
+        start + 9 < resultVO.totalPages ? start + 9 : resultVO.totalPages;
       setLastNum(last);
       setStartNum(start);
     }
-  }, [rsltMap]);
+  }, [resultVO]);
   const pageNumbers =
-    rsltMap !== undefined
+    resultVO !== undefined
       ? Array.from({ length: lastNum }, (_, i) => startNum + i)
       : [];
   return (
@@ -32,7 +34,7 @@ const Paging = <T extends CommDefaultVO>({
       <div className="paging_wrap">
         <a
           style={{
-            display: rsltMap?.first ? "none" : "block",
+            display: resultVO?.first ? "none" : "block",
             cursor: "pointer",
           }}
           title="맨 앞으로"
@@ -45,11 +47,11 @@ const Paging = <T extends CommDefaultVO>({
             cursor: "pointer",
           }}
           onClick={() => {
-            if (rsltMap?.first) {
+            if (resultVO?.first) {
               return;
             } else {
-              if (rsltMap !== undefined) {
-                selectList(rsltMap.number);
+              if (resultVO !== undefined) {
+                selectList(resultVO.number);
               }
             }
           }}
@@ -57,14 +59,14 @@ const Paging = <T extends CommDefaultVO>({
           className="prev"
         ></a>
         <span>
-          {rsltMap !== undefined
+          {resultVO !== undefined
             ? pageNumbers.map((page) => (
                 <a
                   key={page}
                   style={{
                     cursor: "pointer",
                   }}
-                  className={page === rsltMap.number + 1 ? "active" : ""}
+                  className={page === resultVO.number + 1 ? "active" : ""}
                   onClick={() => selectList(page)}
                 >
                   {page}
@@ -80,25 +82,25 @@ const Paging = <T extends CommDefaultVO>({
           title="다음"
           className="next"
           onClick={() => {
-            if (rsltMap !== undefined) {
-              if (rsltMap.last) {
+            if (resultVO !== undefined) {
+              if (resultVO.last) {
                 return;
               } else {
-                selectList(rsltMap?.number + 2);
+                selectList(resultVO?.number + 2);
               }
             }
           }}
         ></a>
         <a
           style={{
-            display: rsltMap ? (rsltMap?.last ? "none" : "block") : "block",
+            display: resultVO ? (resultVO?.last ? "none" : "block") : "block",
             cursor: "pointer",
           }}
           title="맨 뒤로"
           className="nnext"
           onClick={() => {
-            if (rsltMap !== undefined) {
-              selectList(rsltMap.totalPages);
+            if (resultVO !== undefined) {
+              selectList(resultVO.totalPages);
             }
           }}
         ></a>

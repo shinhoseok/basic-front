@@ -18,6 +18,8 @@ interface Pageable {
   offset: number;
   paged: boolean;
   unpaged: boolean;
+  page: number; // 현재페이지
+  size: number; // 페이지 사이즈
 }
 
 interface Sort {

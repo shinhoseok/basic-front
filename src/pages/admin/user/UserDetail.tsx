@@ -5,25 +5,45 @@ import UserVO from "../../../vo/UserVO";
 
 const UserDetail = () => {
   const location = useLocation();
-  // const userId = location.state.userId;
-  const params = useParams();
-  console.log(params);
+  const params = useParams(); //get으로 보낸 아이디를 가져옴
   const [userVO, setUserVO] = useState<UserVO>();
   const navigate = useNavigate();
+
+  //사용자 상세조회
   const selectUserDetail = async () => {
     let param = {
       userId: params.userId,
     };
     await axios.post("/v1/admin/user/selectUserDetail", param).then((res) => {
-      const userVO = res.data.data;
+      const userVO = res.data;
       setUserVO(userVO);
     });
   };
   useEffect(() => {
     selectUserDetail();
   }, []);
+
+  //사용자목록
   const selectUserList = (e: any) => {
     navigate("/admin/user/selectUserList");
+    e.preventDefault();
+  };
+
+  //유저삭제
+  const deleteUserProc = async (e: any) => {
+    if (window.confirm("해당 사용자를 삭제하시겠습니까?")) {
+      let param = {
+        userId: params.userId,
+      };
+      await axios.put("/v1/admin/user/deleteUserProc", param).then((res) => {
+        if (res.data) {
+          alert("삭제가 완료되었습니다.");
+          navigate("/admin/user/selectUserList");
+        } else {
+          alert(res.data.msg);
+        }
+      });
+    }
     e.preventDefault();
   };
   return (
@@ -71,7 +91,9 @@ const UserDetail = () => {
           <tbody className="line">
             <tr>
               <th>주소</th>
-              <td colSpan={4}>{userVO?.addr ? userVO.addr : "-"}</td>
+              <td colSpan={4}>
+                {userVO?.addr ? userVO.addr + " " + userVO.addrDetail : "-"}
+              </td>
             </tr>
             <tr>
               <th>E-mail</th>
@@ -93,13 +115,13 @@ const UserDetail = () => {
             수정
           </button>
         </a>
-        <a href="#">
+        <a onClick={deleteUserProc}>
           <button type="button" className="blueBtn L">
             삭제
           </button>
         </a>
-        <a href="#">
-          <button type="button" className="blueBtn L" onClick={selectUserList}>
+        <a onClick={selectUserList}>
+          <button type="button" className="blueBtn L">
             목록
           </button>
         </a>

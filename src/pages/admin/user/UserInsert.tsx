@@ -22,6 +22,7 @@ const UserInsert = () => {
   const [formValues, setFormValues] = useState<UserVO>(intialValues);
   const [formErrors, setFormErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [addrBasic, setAddrBasic] = useState("");
   const formRef = useRef<null[] | HTMLDivElement[]>([]);
 
   const navigate = useNavigate();
@@ -29,7 +30,16 @@ const UserInsert = () => {
     await axios
       .post("/v1/admin/user/insertUserProc", formValues)
       .then((res) => {
-        navigate("/admin/user/selectUserList");
+        if (res.data.code == 200) {
+          navigate("/admin/user/selectUserList");
+          return;
+        } else if (res.data.code == 400) {
+          alert("중복된 이메일이 존재합니다.");
+          return;
+        } else {
+          alert("서버 오류가 발생했습니다. 관리자에게 문의주세요.");
+          return;
+        }
       });
   };
   const handleChange = (e: any) => {
@@ -71,11 +81,19 @@ const UserInsert = () => {
     }
     return errors;
   };
+
   useEffect(() => {
     if (Object.keys(formErrors).length === 0 && isSubmitting) {
       submitForm();
     }
   }, [formErrors]); //submit을 눌러 formErrors가 변할때만 실행
+
+  useEffect(() => {
+    setFormValues({
+      ...formValues,
+      addr: addrBasic,
+    });
+  }, [addrBasic]); //submit을 눌러 formErrors가 변할때만 실행
 
   // 팝업창 상태 관리
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -215,10 +233,10 @@ const UserInsert = () => {
                     <input
                       id="addr"
                       name="addr"
-                      disabled={true}
-                      onChange={handleChange}
+                      readOnly={true}
                       style={{ width: "240px" }}
                       type="text"
+                      value={addrBasic}
                     />
                     <button
                       type="button"
@@ -230,7 +248,10 @@ const UserInsert = () => {
                     <div id="popupDom">
                       {isPopupOpen && (
                         <PopupDom>
-                          <PopupPostCode onClose={closePostCode} />
+                          <PopupPostCode
+                            onClose={closePostCode}
+                            setAddrBasic={setAddrBasic}
+                          />
                         </PopupDom>
                       )}
                     </div>

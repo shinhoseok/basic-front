@@ -4,33 +4,65 @@ import { Link, useNavigate } from "react-router-dom";
 import UserVO from "../../../vo/UserVO";
 import Paging from "../../common/Paging";
 import PageableVO from "../../../vo/PageableVO";
+import CommDefaultVO from "../../../vo/CommDefaultVO";
 
 const UserList = () => {
-  const [rsltMap, setRsltMap] = useState<PageableVO<UserVO>>();
-  const [searchCondition, setSearchCondition] = useState<string>("");
-  const [searchKeyword, setSearchKeyword] = useState<string>("");
+  const [userVO, setUserVO] = useState<PageableVO<UserVO>>();
   const navigate = useNavigate();
+
+  //검색값 초기화
+  const intialFormValues = {
+    page: 1,
+    searchCondition: "userNm",
+    searchKeyword: "",
+    sortSubject: "",
+    sortDescend: "",
+  } as CommDefaultVO;
+  const [formValues, setFormValues] = useState<CommDefaultVO>(intialFormValues);
+
+  //목록검색
   const selectUserList = async (pageNum: number) => {
-    let param = {
+    setFormValues({
+      ...formValues,
       page: pageNum,
-      searchKeyword: searchKeyword,
-      searchCondition: searchCondition,
-    };
-    await axios.post("/v1/admin/user/selectUserList", param).then((res) => {
-      const userList = res.data.data.userList;
-      setRsltMap(userList);
     });
+    await axios
+      .post("/v1/admin/user/selectUserList", formValues)
+      .then((res) => {
+        console.log(res.data);
+        const resultList = res.data.userList;
+        setUserVO(resultList);
+      });
   };
   useEffect(() => {
     selectUserList(1);
   }, []);
+
+  //등록화면 이동
   const insertUser = (e: any) => {
     navigate("/admin/user/insertUser");
     e.preventDefault();
   };
+
+  //상세화면 이동
   const selectUserDetail = (userId: string) => {
     navigate(`/admin/user/selectUserDetail/${userId}`);
   };
+
+  const handleSelect = (e: any) => {
+    setFormValues({
+      ...formValues,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const activeEnter = (e: any) => {
+    if (e.key === "Enter") {
+      selectUserList(1);
+    }
+  };
+
+  //사용자 등록보고 검색값, 소팅값 세팅해서 던져야함  handleChange
   return (
     <div className="contents">
       <p className="contentTitle">사용자 관리</p>
@@ -44,16 +76,29 @@ const UserList = () => {
       </p>
       <div className="selectBox">
         <select
-          name="select"
+          name="searchCondition"
           className="w13p"
-          value={searchCondition}
-          onChange={(e) => setSearchCondition(e.target.value)}
+          value={formValues.searchCondition}
+          onChange={handleSelect}
         >
           <option value="userNm">성명</option>
           <option value="emailAddr">이메일</option>
         </select>
-        <input className="searchName" name="" type="text" />
-        <button type="button" className="grayBtn ico">
+        <input
+          className="searchName"
+          name="searchKeyword"
+          type="text"
+          value={formValues.searchKeyword}
+          onChange={handleSelect}
+          onKeyDown={(e) => activeEnter(e)}
+        />
+        <button
+          type="button"
+          className="grayBtn ico"
+          onClick={() => {
+            selectUserList(1);
+          }}
+        >
           <img src={require("@contents/images/ico_search.png")} /> 검색
         </button>
       </div>
@@ -91,7 +136,7 @@ const UserList = () => {
                   <a href="#"></a>
                 </span>
               </th>
-              <th>부서</th>
+              <th>이메일</th>
               <th>
                 가입일자
                 <span className="arrow_ascending">
@@ -104,8 +149,8 @@ const UserList = () => {
             </tr>
           </thead>
           <tbody>
-            {rsltMap?.content && rsltMap?.content.length > 0 ? (
-              rsltMap?.content.map((user, idx) => (
+            {userVO?.content && userVO?.content.length > 0 ? (
+              userVO?.content.map((user, idx) => (
                 <tr
                   key={idx}
                   className="row"
@@ -134,7 +179,7 @@ const UserList = () => {
           </a>
         </div>
       </div>
-      <Paging selectList={selectUserList} rsltMap={rsltMap} />
+      <Paging selectList={selectUserList} resultVO={userVO} />
     </div>
   );
 };
