@@ -3,7 +3,7 @@ interface CommDefaultVO {
   regId: string;
   modDt: string;
   modId: string;
-  page: number;
+  pageNum: number;
   searchCondition: string;
   searchKeyword: string;
   sortSubject: string;

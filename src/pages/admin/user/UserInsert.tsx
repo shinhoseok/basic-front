@@ -1,6 +1,6 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import TypeChecker from "../../../contents/js/TypeChecker";
 import UserVO from "../../../vo/UserVO";
 import ErrorVO from "../../../vo/ErrorVO";
@@ -11,6 +11,7 @@ import PopupPostCode from "../../common/PopupPostCode";
 // import KakaoJusoPopupPostCode from "../../common/KakaoJusoPopupPostCode";
 
 const UserInsert = () => {
+  const location = useLocation();
   const intialValues = {
     emailAddr: "",
     userPw: "",
@@ -27,20 +28,21 @@ const UserInsert = () => {
 
   const navigate = useNavigate();
   const submitForm = async () => {
-    await axios
-      .post("/v1/admin/user/insertUserProc", formValues)
-      .then((res) => {
-        if (res.data.code == 200) {
-          navigate("/admin/user/selectUserList");
-          return;
-        } else if (res.data.code == 400) {
-          alert("중복된 이메일이 존재합니다.");
-          return;
-        } else {
-          alert("서버 오류가 발생했습니다. 관리자에게 문의주세요.");
-          return;
-        }
-      });
+    try {
+      const res = await axios.post("/v1/admin/user/insertUserProc", formValues);
+      console.log(res);
+      if (res.status === 200) {
+        navigate("/admin/user/selectUserList");
+      }
+    } catch (error) {
+      // 에러 객체의 타입을 AxiosError로 지정하여 타입 안정성을 보장
+      const axiosError = error as AxiosError;
+      if (axiosError.response && axiosError.response.status === 409) {
+        alert("중복된 이메일이 존재합니다.");
+      } else {
+        alert("서버 오류가 발생했습니다. 관리자에게 문의주세요.");
+      }
+    }
   };
   const handleChange = (e: any) => {
     setFormValues({
@@ -106,6 +108,13 @@ const UserInsert = () => {
   // 팝업창 닫기
   const closePostCode = () => {
     setIsPopupOpen(false);
+  };
+
+  //사용자목록
+  const selectUserList = (e: any) => {
+    const params = location.state.params;
+    navigate(`/admin/user/selectUserList`, { state: { params } });
+    e.preventDefault();
   };
 
   return (
@@ -280,7 +289,7 @@ const UserInsert = () => {
               등록
             </button>
           </a>
-          <a href="#">
+          <a onClick={selectUserList}>
             <button type="button" className="blueBtn L">
               취소
             </button>

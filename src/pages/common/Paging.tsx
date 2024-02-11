@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import PageableVO from "../../vo/PageableVO";
 
 interface PageProps<T> {
-  selectList: (pageNum: number) => Promise<void>;
+  selectList: (pageNum: number) => void;
   resultVO?: PageableVO<T>;
 }
 const Paging = <T extends CommDefaultVO>({
@@ -14,9 +14,8 @@ const Paging = <T extends CommDefaultVO>({
 }: PageProps<T>) => {
   const [startNum, setStartNum] = useState<number>(0);
   const [lastNum, setLastNum] = useState<number>(0);
+  console.log(resultVO);
   useEffect(() => {
-    console.log("paging!!!");
-    console.log(resultVO);
     if (resultVO) {
       const start = Math.floor(resultVO.number / 10) * 10 + 1;
       const last =
@@ -25,10 +24,14 @@ const Paging = <T extends CommDefaultVO>({
       setStartNum(start);
     }
   }, [resultVO]);
+  if (resultVO === null) {
+    return null; // resultVO가 null이면 아무것도 렌더링하지 않음
+  }
   const pageNumbers =
     resultVO !== undefined
       ? Array.from({ length: lastNum }, (_, i) => startNum + i)
       : [];
+
   return (
     <div className="paging_place">
       <div className="paging_wrap">

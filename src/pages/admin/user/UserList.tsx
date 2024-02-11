@@ -1,52 +1,76 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import UserVO from "../../../vo/UserVO";
 import Paging from "../../common/Paging";
 import PageableVO from "../../../vo/PageableVO";
-import CommDefaultVO from "../../../vo/CommDefaultVO";
 
 const UserList = () => {
   const [userVO, setUserVO] = useState<PageableVO<UserVO>>();
   const navigate = useNavigate();
+  const location = useLocation();
 
   //검색값 초기화
   const intialFormValues = {
-    page: 1,
+    pageNum: 1,
     searchCondition: "userNm",
     searchKeyword: "",
     sortSubject: "",
     sortDescend: "",
-  } as CommDefaultVO;
-  const [formValues, setFormValues] = useState<CommDefaultVO>(intialFormValues);
+  } as UserVO;
+  const [formValues, setFormValues] = useState<UserVO>(intialFormValues);
 
-  //목록검색
-  const selectUserList = async (pageNum: number) => {
-    setFormValues({
-      ...formValues,
-      page: pageNum,
-    });
-    await axios
-      .post("/v1/admin/user/selectUserList", formValues)
+  // 목록검색
+  const selectUserList = (pageNum: number) => {
+    setFormValues((prevFormValues) => ({
+      ...prevFormValues,
+      pageNum: pageNum,
+    }));
+    axios
+      .post("/v1/admin/user/selectUserList", {
+        ...formValues,
+        pageNum: pageNum,
+      })
       .then((res) => {
-        console.log(res.data);
         const resultList = res.data.userList;
         setUserVO(resultList);
       });
   };
+
   useEffect(() => {
-    selectUserList(1);
-  }, []);
+    const state = location.state;
+    if (state != null && state.params != null) {
+      setFormValues(state.params);
+      selectUserList(state.params.pageNum);
+    } else {
+      selectUserList(1);
+    }
+  }, []); // useEffect의 의존성 배열을 빈 배열로 설정하여 컴포넌트가 처음 마운트될 때 한 번만 실행되도록 설정
 
   //등록화면 이동
   const insertUser = (e: any) => {
-    navigate("/admin/user/insertUser");
+    const params = {
+      pageNum: formValues.pageNum,
+      searchCondition: formValues.searchCondition,
+      searchKeyword: formValues.searchKeyword,
+      sortSubject: formValues.sortSubject,
+      sortDescend: formValues.sortDescend,
+    };
+    navigate("/admin/user/insertUser", { state: { params } });
     e.preventDefault();
   };
 
   //상세화면 이동
-  const selectUserDetail = (userId: string) => {
-    navigate(`/admin/user/selectUserDetail/${userId}`);
+  const selectUserDetail = async (userId: string) => {
+    const params = {
+      userId: userId,
+      pageNum: formValues.pageNum,
+      searchCondition: formValues.searchCondition,
+      searchKeyword: formValues.searchKeyword,
+      sortSubject: formValues.sortSubject,
+      sortDescend: formValues.sortDescend,
+    };
+    navigate(`/admin/user/selectUserDetail`, { state: { params } });
   };
 
   const handleSelect = (e: any) => {
@@ -60,6 +84,15 @@ const UserList = () => {
     if (e.key === "Enter") {
       selectUserList(1);
     }
+  };
+
+  const fn_sort = async (sortSubject: string, sortDescend: string) => {
+    await setFormValues({
+      ...formValues,
+      sortSubject: sortSubject,
+      sortDescend: sortDescend,
+    });
+    selectUserList(formValues.pageNum);
   };
 
   //사용자 등록보고 검색값, 소팅값 세팅해서 던져야함  handleChange
@@ -120,30 +153,50 @@ const UserList = () => {
                 <div>
                   아이디
                   <span className="arrow_ascending">
-                    <a href="#"></a>
+                    <a
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        fn_sort("userId", "asc");
+                      }}
+                      style={{ cursor: "pointer" }}
+                    ></a>
                   </span>
                   <span className="arrow_descending">
-                    <a href="#"></a>
+                    <a
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        fn_sort("userId", "desc");
+                      }}
+                      style={{ cursor: "pointer" }}
+                    ></a>
                   </span>
                 </div>
               </th>
-              <th>
-                성명
-                <span className="arrow_ascending">
-                  <a href="#"></a>
-                </span>
-                <span className="arrow_descending">
-                  <a href="#"></a>
-                </span>
-              </th>
+              <th>성명</th>
               <th>이메일</th>
               <th>
                 가입일자
                 <span className="arrow_ascending">
-                  <a href="#"></a>
+                  <a
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      fn_sort("regDt", "asc");
+                    }}
+                    style={{ cursor: "pointer" }}
+                  ></a>
                 </span>
                 <span className="arrow_descending">
-                  <a href="#"></a>
+                  <a
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      fn_sort("regDt", "desc");
+                    }}
+                    style={{ cursor: "pointer" }}
+                  ></a>
                 </span>
               </th>
             </tr>

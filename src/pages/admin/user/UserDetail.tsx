@@ -5,16 +5,13 @@ import UserVO from "../../../vo/UserVO";
 
 const UserDetail = () => {
   const location = useLocation();
-  const params = useParams(); //get으로 보낸 아이디를 가져옴
   const [userVO, setUserVO] = useState<UserVO>();
   const navigate = useNavigate();
 
   //사용자 상세조회
   const selectUserDetail = async () => {
-    let param = {
-      userId: params.userId,
-    };
-    await axios.post("/v1/admin/user/selectUserDetail", param).then((res) => {
+    const params = location.state.params;
+    await axios.post("/v1/admin/user/selectUserDetail", params).then((res) => {
       const userVO = res.data;
       setUserVO(userVO);
     });
@@ -25,12 +22,14 @@ const UserDetail = () => {
 
   //사용자목록
   const selectUserList = (e: any) => {
-    navigate("/admin/user/selectUserList");
+    const params = location.state.params;
+    navigate(`/admin/user/selectUserList`, { state: { params } });
     e.preventDefault();
   };
 
   //유저삭제
   const deleteUserProc = async (e: any) => {
+    const params = location.state.params;
     if (window.confirm("해당 사용자를 삭제하시겠습니까?")) {
       let param = {
         userId: params.userId,
@@ -73,7 +72,6 @@ const UserDetail = () => {
                   ? new Date(userVO.regDt).toISOString().slice(0, 10)
                   : "-"}
               </td>
-              {/* <td colSpan={4}> 2014-02-07</td> */}
             </tr>
           </tbody>
         </table>
